@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jewelry Shop</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+    <header>
+        <header class="navbar">
+            <a href="request"><button class="request-btn">Оставить заявку</button></a>
+            <div class="logo">
+                <a href="/"><img th:src="@{img/mainlogo.png}" alt="Logo"></a>
+            </div>
+            <div class="icons">
+                <a href="cart"> <img th:src="@{cart/icons8-cart-96.png}" alt="Корзина" class="icon"></a>
+                <a href="#"><img th:src="@{icons/icons8-стопка-фотографий-96.png}" alt="Галлерея" class="icon"></a>
+                <a href="#"><img th:src="@{icons/icons8-гость-мужчина-96.png}" alt="Галлерея" class="icon"></a>
+            </div>
+        </header>
+    </header>
+    <main class="main-content">
+        <h1 class="main-heading">Ювелирные украшения на ваш вкус</h1>
+        <div class="categories">
+            <a href="ring_constructor" class="category">
+                <img th:src="@{img/ring.jpeg}" alt="Кольца">
+                <p>Кольца</p>
+            </a>
+            <a href="#" class="category">
+                <img th:src="@{img/braslette.jpeg}" alt="Браслеты">
+                <p>Браслеты</p>
+            </a>
+            <a href="#l" class="category">
+                <img th:src="@{img/earrings.jpeg}" alt="Серьги">
+                <p>Серьги</p>
+            </a>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="contact-info">
+                <h3>Контактная информация</h3>
+                <p><strong>Телефон:</strong> <span>+7 (123) 456-78-90</span></p>
+                <p><strong>Почта:</strong> <span>info@example.com</span></p>
+                <p><strong>Адрес:</strong> <span>г. Москва, ул. Примерная, д. 1</span></p>
+            </div>
+            <div class="social-media">
+                <h3>Мы в социальных сетях</h3>
+                <a href="https://vk.com" target="_blank" class="social-icon">
+                    <img th:src="@{icons/icons8-вконтакте-96.png}" alt="Вконтакте">
+                </a>
+                <a href="https://telegram.org" target="_blank" class="social-icon">
+                    <img th:src="@{icons/icons8-телеграмма-app-96.png}" alt="Телеграмм">
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

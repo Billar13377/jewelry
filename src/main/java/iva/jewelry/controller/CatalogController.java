@@ -51,7 +51,6 @@ public class CatalogController {
 
             Material material = materialRepository
                     .findByCode(materialCode)
-                    //.findById(materialCode)
                     .orElseThrow(() -> new RuntimeException("Material not found " + materialCode));
 
             List<Integer> purities = material.getVariants()

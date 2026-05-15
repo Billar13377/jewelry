@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jewelry Shop</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+<header>
+    <header class="navbar">
+        <a href="request"><button class="request-btn">Оставить заявку</button></a>
+        <div class="logo">
+            <a href="/"><img th:src="@{img/mainlogo.png}" alt="Logo"></a>
+        </div>
+        <div class="icons">
+            <a href="cart"> <img th:src="@{cart/icons8-cart-96.png}" alt="Корзина" class="icon"></a>
+            <a href="#"><img th:src="@{icons/icons8-стопка-фотографий-96.png}" alt="Галлерея" class="icon"></a>
+            <a href="#"><img th:src="@{icons/icons8-гость-мужчина-96.png}" alt="Галлерея" class="icon"></a>
+        </div>
+    </header>
+</header>
+
+        <main class="cart-page">
+            <section class="cart-items">
+                <h2>Товары в корзине</h2>
+                <div class="cart-item">
+                    <img th:src="@{img/ring1.jpeg}" alt="Кольцо" class="item-image">
+                    <div class="item-details">
+                        <h3>Кольцо из золота</h3>
+                        <p>Размер: 17</p>
+                        <p>Камень: Бриллиант</p>
+                        <p>Цена: 50 000 руб.</p>
+                    </div>
+                </div>
+                <div class="cart-item">
+                    <img th:src="@{img/ring1.jpeg}" alt="Кольцо" class="item-image">
+                    <div class="item-details">
+                        <h3>Кольцо из белого золота</h3>
+                        <p>Размер: 16</p>
+                        <p>Камень: Сапфир</p>
+                        <p>Цена: 45 000 руб.</p>
+                    </div>
+                </div>
+            </section>
+    
+            <aside class="checkout-card">
+                <h2>Оформление заказа</h2>
+                <form id="checkout-form">
+                    <label for="name">ФИО</label>
+                    <input type="text" id="name" name="name" placeholder="Введите ФИО" required>
+    
+                    <label for="phone">Телефон</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Введите телефон" required>
+    
+                    <label for="email">Электронная почта</label>
+                    <input type="email" id="email" name="email" placeholder="Введите email" required>
+    
+                    <button type="submit" class="submit-btn">Оформить заказ</button>
+                </form>
+            </aside>
+        </main>
+
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="contact-info">
+            <h3>Контактная информация</h3>
+            <p><strong>Телефон:</strong> <span>+7 (123) 456-78-90</span></p>
+            <p><strong>Почта:</strong> <span>info@example.com</span></p>
+            <p><strong>Адрес:</strong> <span>г. Москва, ул. Примерная, д. 1</span></p>
+        </div>
+        <div class="social-media">
+            <h3>Мы в социальных сетях</h3>
+            <a href="https://vk.com" target="_blank" class="social-icon">
+                <img th:src="@{icons/icons8-вконтакте-96.png}" alt="Вконтакте">
+            </a>
+            <a href="https://telegram.org" target="_blank" class="social-icon">
+                <img th:src="@{icons/icons8-телеграмма-app-96.png}" alt="Телеграмм">
+            </a>
+        </div>
+    </div>
+</footer>
+    </body>
+</html>

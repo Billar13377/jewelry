@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jewelry Shop</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+<h1>Вход</h1>
+<div th:if="${error}">
+    Unable to login. Check your username and password.
+</div>
+<p>New here? Click
+<a th:href="@{/register}">here</a> to register.</p>
+
+<form method="POST" th:action="@{/login}" id="loginForm">
+    <label for="username">Имя пользователя: </label>
+    <input type="text" name="username" id="username" /><br/>
+    <label for="password">Пароль: </label>
+    <input type="password" name="password" id="password" /><br/>
+
+    <input type="submit" value="Login"/>
+</form>
+</body>
+</html>

@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConstructorService {
 
-    private final ProductConfigService configService;
     private final MaterialRepository materialRepository;
     private final StoneRepository stoneRepository;
     private final ProductModelRepository productModelRepository;
@@ -30,8 +29,8 @@ public class ConstructorService {
     private final SnapshotService snapshotService;
 
     public ProductSnapshot build(ProductConfiguration config) {
-
-        ProductModel model = configService.validate(config);
+        ProductModel model = productModelRepository.findById(config.getModelId())
+                .orElseThrow(() -> new RuntimeException("Model not found"));
 
         Material material = materialRepository
                 .findByCode(config.getMaterial())
@@ -66,8 +65,8 @@ public class ConstructorService {
 
     public BigDecimal calculatePrice(ProductConfiguration config) {
 
-        ProductModel model = configService.validate(config);
-
+        ProductModel model = productModelRepository.findById(config.getModelId())
+                .orElseThrow(() -> new RuntimeException("Model not found"));
         Material material = materialRepository
                 .findByCode(config.getMaterial())
                 .orElseThrow(() -> new RuntimeException("Material not found"));
