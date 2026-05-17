@@ -2,7 +2,7 @@ package iva.jewelry.service;
 
 import iva.jewelry.dto.StoneVariant;
 import iva.jewelry.model.*;
-import iva.jewelry.repository.*;
+import iva.jewelry.repository.mongo.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,27 +19,22 @@ public class AdminProductService {
     private final StoneRepository stoneRepository;
     private final ProductLayerRepository productLayerRepository;
 
-    // 🔹 создать категорию
     public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    // 🔹 получить все
     public List<Category> getCategories() {
         return categoryRepository.findAll();
     }
 
-    // 🔹 удалить
     public void deleteCategory(String id) {
         categoryRepository.deleteById(id);
     }
 
-    // 🔹 создать модель
     public ProductModel createModel(ProductModel model) {
         return modelRepository.save(model);
     }
 
-    // 🔹 обновить
     public ProductModel updateModel(String id, ProductModel updated) {
         ProductModel model = modelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Model not found"));
@@ -58,12 +53,10 @@ public class AdminProductService {
         return modelRepository.save(model);
     }
 
-    // 🔹 удалить
     public void deleteModel(String id) {
         modelRepository.deleteById(id);
     }
 
-    // 🔹 получить
     public List<ProductModel> getAllModels() {
         return modelRepository.findAll();
     }

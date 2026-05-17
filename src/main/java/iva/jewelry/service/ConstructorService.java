@@ -6,10 +6,10 @@ import iva.jewelry.model.Material;
 import iva.jewelry.model.ProductLayer;
 import iva.jewelry.model.ProductModel;
 import iva.jewelry.model.Stone;
-import iva.jewelry.repository.MaterialRepository;
-import iva.jewelry.repository.ProductLayerRepository;
-import iva.jewelry.repository.ProductModelRepository;
-import iva.jewelry.repository.StoneRepository;
+import iva.jewelry.repository.mongo.MaterialRepository;
+import iva.jewelry.repository.mongo.ProductLayerRepository;
+import iva.jewelry.repository.mongo.ProductModelRepository;
+import iva.jewelry.repository.mongo.StoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -97,8 +97,6 @@ public class ConstructorService {
     }
 
     public List<ProductLayer> getLayers(String modelId){
-        ProductModel model = productModelRepository.findById(modelId)
-                .orElseThrow(() -> new RuntimeException("Model not found"));
         return productLayerRepository.findByModelId(modelId);
     }
 

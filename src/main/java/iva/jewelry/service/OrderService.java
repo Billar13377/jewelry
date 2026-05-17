@@ -1,10 +1,9 @@
 package iva.jewelry.service;
 
 import iva.jewelry.model.*;
-import iva.jewelry.repository.*;
+import iva.jewelry.repository.jpa.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,50 +20,67 @@ public class OrderService {
     private final OrderStatusRepository orderStatusRepository;
     private final CartProductRepository cartRepository;
     private final StatusRepository statusRepository;
-    private final UserRepository userRepository;
+    private final AuthContextService authContextService;
 
-    public Order createOrder() {
-        User user = getAuthenticatedUser();
-        List<CartProduct> cartItems =
-                cartRepository.findByUser(user);
+@Transactional
+public Order createOrder() {
+    User user = authContextService.getCurrentUser();
+    List<CartProduct> cartItems = cartRepository.findByUser(user);
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setDateOfCreation(new Date());
-        order.setDateExpected(new Date(System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000));
-        orderRepository.save(order);
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (CartProduct cart : cartItems) {
-
-            OrderProduct item = new OrderProduct();
-
-            item.setOrder(order);
-            item.setProductSnapshot(cart.getProductSnapshot());
-            item.setAmount(cart.getAmount());
-
-            BigDecimal itemTotal = cart.getTotalPrice();
-            total = total.add(itemTotal);
-
-            orderItemRepository.save(item);
-
-        }
-        order.setTotalPrice(total);
-
-        Status createdStatus = statusRepository.findByName("Создан")
-                .orElseThrow(() -> new IllegalStateException("Статус 'Создан' не найден"));
-        OrderStatus orderStatus = new OrderStatus(new OrderStatusId(order.getId(), createdStatus.getId()), new Date(), order, createdStatus);
-        orderStatusRepository.save(orderStatus);
-
-        cartRepository.deleteAll(cartItems);
-
-        return order;
+    if (cartItems == null || cartItems.isEmpty()) {
+        throw new IllegalStateException("Корзина пуста. Добавьте товары перед оформлением заказа");
     }
 
+    Order order = new Order();
+    order.setUser(user);
+    order.setDateOfCreation(new Date());
+    order.setDateExpected(new Date(System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000L));
+    order.setTotalPrice(BigDecimal.ZERO);
+    order = orderRepository.save(order);
+
+    BigDecimal total = BigDecimal.ZERO;
+
+    for (CartProduct cart : cartItems) {
+        OrderProduct item = new OrderProduct();
+        item.setOrder(order);
+        item.setProductSnapshot(cart.getProductSnapshot());
+        item.setAmount(cart.getAmount());
+
+        BigDecimal itemTotal = cart.getTotalPrice();
+        if (itemTotal != null) {
+            total = total.add(itemTotal);
+        }
+
+        orderItemRepository.save(item);
+    }
+
+    order.setTotalPrice(total);
+    order = orderRepository.save(order);
+
+    Status createdStatus = statusRepository.findByName("Создан")
+            .orElseThrow(() -> new IllegalStateException("Статус 'Создан' не найден"));
+
+    OrderStatus orderStatus = new OrderStatus();
+    orderStatus.setId(new OrderStatusId(order.getId(), createdStatus.getId()));
+    orderStatus.setDateOfChanging(new Date());
+    orderStatus.setOrder(order);
+    orderStatus.setStatus(createdStatus);
+    orderStatusRepository.save(orderStatus);
+
+    cartRepository.deleteAll(cartItems);
+
+    return order;
+}
+
+    @Transactional(readOnly = true)
     public List<Order> getUserOrders() {
-        User user = getAuthenticatedUser();
-        return orderRepository.findByUser(user);
+        User user = authContextService.getCurrentUser();
+        List<Order> orders = orderRepository.findByUser(user);
+        orders.forEach(o -> {
+            Hibernate.initialize(o.getOrderProducts());
+            Hibernate.initialize(o.getOrderStatuses());
+        });
+        return orders;
     }
 
     @Transactional
@@ -90,16 +106,6 @@ public class OrderService {
         orderStatus.setDateOfChanging(new Date());
 
         orderStatusRepository.save(orderStatus);
-    }
-
-    private User getAuthenticatedUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return userRepository.findByEmail(((UserDetails) principal).getUsername())
-                    .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
-        } else {
-            throw new IllegalStateException("Ошибка аутентификации");
-        }
     }
 
     public List<Order> getAllOrders() {

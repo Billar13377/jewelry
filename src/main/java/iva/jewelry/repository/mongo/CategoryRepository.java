@@ -1,4 +1,4 @@
-package iva.jewelry.repository;
+package iva.jewelry.repository.mongo;
 
 import iva.jewelry.model.Category;
 import org.springframework.data.mongodb.repository.MongoRepository;

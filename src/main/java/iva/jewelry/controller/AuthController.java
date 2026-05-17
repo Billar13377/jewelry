@@ -5,6 +5,7 @@ import iva.jewelry.dto.RequestDto;
 import iva.jewelry.dto.VerifyUserDto;
 import iva.jewelry.service.AuthService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<RequestDto> signUp(@RequestBody RequestDto signUpRequest){
+    public ResponseEntity<RequestDto> signUp(@Valid @RequestBody RequestDto signUpRequest){
         return ResponseEntity.ok(authService.signUp(signUpRequest));
     }
     @PostMapping("/signin")

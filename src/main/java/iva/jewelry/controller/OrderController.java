@@ -7,6 +7,7 @@ import iva.jewelry.model.OrderProduct;
 import iva.jewelry.model.Status;
 import iva.jewelry.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class OrderController {
     }
 
     @GetMapping("/")
+    @Transactional(readOnly = true)
     public List<OrderSummary> getOrders() {
         List<Order> orders = orderService.getUserOrders();
         return orders.stream()

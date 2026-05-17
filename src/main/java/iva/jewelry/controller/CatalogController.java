@@ -3,7 +3,7 @@ package iva.jewelry.controller;
 import iva.jewelry.dto.ConstructorResponse;
 import iva.jewelry.dto.MaterialVariant;
 import iva.jewelry.model.*;
-import iva.jewelry.repository.MaterialRepository;
+import iva.jewelry.repository.mongo.MaterialRepository;
 import iva.jewelry.service.CatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/catalog")
 @RequiredArgsConstructor
 public class CatalogController {
     private final CatalogService catalogService;
-    private final MaterialRepository materialRepository;
 
     @GetMapping("/categories")
     public List<Category> categories() { return catalogService.getCategories(); }
@@ -37,30 +37,8 @@ public class CatalogController {
 
         ProductModel model = catalogService.getModel(modelId);
         List<ProductLayer> layers = catalogService.getLayers(modelId);
-        Map<String, List<Integer>> purities = buildMaterialPurities(model);
-
-
+        Map<String, List<Integer>> purities = catalogService.getMaterialPurities(model);
         return new ConstructorResponse(model, layers, purities);
     }
 
-    private Map<String, List<Integer>> buildMaterialPurities(ProductModel model) {
-
-        Map<String, List<Integer>> result = new HashMap<>();
-
-        for (String materialCode : model.getMaterials()) {
-
-            Material material = materialRepository
-                    .findByCode(materialCode)
-                    .orElseThrow(() -> new RuntimeException("Material not found " + materialCode));
-
-            List<Integer> purities = material.getVariants()
-                    .stream()
-                    .map(MaterialVariant::getPurity)
-                    .toList();
-
-            result.put(materialCode, purities);
-        }
-
-        return result;
-    }
 }

@@ -5,12 +5,9 @@ import iva.jewelry.dto.CartSummary;
 import iva.jewelry.dto.ProductSnapshot;
 import iva.jewelry.model.CartProduct;
 import iva.jewelry.model.User;
-import iva.jewelry.repository.CartProductRepository;
-import iva.jewelry.repository.UserRepository;
+import iva.jewelry.repository.jpa.CartProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,14 +19,13 @@ import java.util.Optional;
 public class CartService {
 
     private final CartProductRepository cartRepository;
-    private final UserRepository userRepository;
     private final ObjectMapper mapper;
     private final SnapshotPriceSyncService snapshotPriceSyncService;
+    private final AuthContextService authContextService;
 
     @Transactional
     public CartProduct addToCart(ProductSnapshot snapshot, int amount) throws Exception {
-        User user = getAuthenticatedUser();
-
+        User user = authContextService.getCurrentUser();
         String hash = hash(snapshot);
 
         Optional<CartProduct> existing =
@@ -63,14 +59,24 @@ public class CartService {
     }
 
     public List<CartProduct> getCart() {
-        User user = getAuthenticatedUser();
-
+        User user = authContextService.getCurrentUser();
         List<CartProduct> cart = cartRepository.findByUser(user);
         for (CartProduct item : cart) {
             ProductSnapshot updated = snapshotPriceSyncService.refreshPrice(item.getProductSnapshot());
             item.setProductSnapshot(updated);
         }
-        return cartRepository.saveAll(cart);
+        List<CartProduct> updated = cart.stream()
+                .filter(item -> {
+                    ProductSnapshot refreshed = snapshotPriceSyncService.refreshPrice(item.getProductSnapshot());
+                    if (!refreshed.getPrice().equals(item.getProductSnapshot().getPrice())) {
+                        item.setProductSnapshot(refreshed);
+                        return true;
+                    }
+                    return false;
+                })
+                .toList();
+        cartRepository.saveAll(updated);
+        return cart;
     }
     public CartSummary getCartSummary() {
         List<CartProduct> items = getCart();
@@ -80,18 +86,8 @@ public class CartService {
         return new CartSummary(items, total);
     }
 
-
     public void remove(Long id) {
         cartRepository.deleteById(id);
-    }
-    private User getAuthenticatedUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return userRepository.findByEmail(((UserDetails) principal).getUsername())
-                    .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
-        } else {
-            throw new IllegalStateException("Ошибка аутентификации");
-        }
     }
 
     private String hash(ProductSnapshot snapshot) {

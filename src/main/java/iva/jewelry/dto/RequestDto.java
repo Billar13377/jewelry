@@ -3,6 +3,9 @@ package iva.jewelry.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import iva.jewelry.model.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -17,7 +20,10 @@ public class RequestDto {
     private String refreshToken;
     private String expirationTime;
     private String name;
+    @Email
+    @NotBlank
     private String email;
+    @Size(min = 6, max = 20)
     private String password;
     private User user;
     private String firstName;

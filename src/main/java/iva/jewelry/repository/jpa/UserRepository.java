@@ -1,4 +1,4 @@
-package iva.jewelry.repository;
+package iva.jewelry.repository.jpa;
 
 import iva.jewelry.model.User;
 import org.springframework.data.jpa.repository.EntityGraph;

@@ -5,8 +5,8 @@ import iva.jewelry.dto.RequestDto;
 import iva.jewelry.dto.VerifyUserDto;
 import iva.jewelry.model.Role;
 import iva.jewelry.model.User;
-import iva.jewelry.repository.RoleRepository;
-import iva.jewelry.repository.UserRepository;
+import iva.jewelry.repository.jpa.RoleRepository;
+import iva.jewelry.repository.jpa.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -64,7 +64,6 @@ public class AuthService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
             User user = userRepository.findByEmail(signInRequest.getEmail()).orElseThrow();
-            System.out.println("USER IS: "+ user);
             String jwt = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
@@ -78,22 +77,41 @@ public class AuthService {
         }
         return response;
     }
+public RequestDto refreshToken(RequestDto refreshTokenRequest){
+    RequestDto response = new RequestDto();
 
-    public RequestDto refreshToken(RequestDto refreshTokenRequest){
-        RequestDto response = new RequestDto();
-        String ourEmail = jwtService.extractUsername(refreshTokenRequest.getToken());
-        User user = userRepository.findByEmail(ourEmail).orElseThrow();
-        if (jwtService.isTokenValid(refreshTokenRequest.getToken(), user)) {
-            String jwt = jwtService.generateToken(user);
-            response.setStatusCode(200);
-            response.setToken(jwt);
-            response.setRefreshToken(refreshTokenRequest.getToken());
-            response.setExpirationTime("24Hr");
-            response.setMessage("Successfully Refreshed Token");
-        }
-        response.setStatusCode(500);
+    if (refreshTokenRequest == null || refreshTokenRequest.getRefreshToken() == null) {
+        response.setStatusCode(400);
+        response.setError("Refresh token is required");
         return response;
     }
+
+    try {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+
+        String userEmail = jwtService.extractUsername(refreshToken);
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (jwtService.isTokenValid(refreshToken, user)) {
+            String newAccessToken = jwtService.generateToken(user);
+
+            response.setStatusCode(200);
+            response.setToken(newAccessToken);
+            response.setRefreshToken(refreshToken);
+            response.setExpirationTime("24Hr");
+            response.setMessage("Successfully Refreshed Token");
+        } else {
+            response.setStatusCode(401);
+            response.setError("Invalid or expired refresh token");
+        }
+    } catch (Exception e) {
+        response.setStatusCode(500);
+        response.setError(e.getMessage());
+    }
+    return response;
+}
     public void verifyUser(VerifyUserDto input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
         if (optionalUser.isPresent()) {

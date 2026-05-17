@@ -1,4 +1,4 @@
-package iva.jewelry.repository;
+package iva.jewelry.repository.jpa;
 
 import iva.jewelry.model.OrderStatus;
 import iva.jewelry.model.OrderStatusId;

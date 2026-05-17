@@ -1,12 +1,14 @@
 package iva.jewelry.service;
 
 import iva.jewelry.model.Role;
-import iva.jewelry.repository.RoleRepository;
-import iva.jewelry.repository.UserRepository;
+import iva.jewelry.repository.jpa.RoleRepository;
+import iva.jewelry.repository.jpa.UserRepository;
 import iva.jewelry.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,12 +29,10 @@ public class UserService implements UserDetailsService {
     public List<User> allUsers() {
             return userRepository.findAll();
 }
-
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
     }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow();
