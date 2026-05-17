@@ -24,6 +24,7 @@ public class CartService {
     private final CartProductRepository cartRepository;
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
+    private final SnapshotPriceSyncService snapshotPriceSyncService;
 
     @Transactional
     public CartProduct addToCart(ProductSnapshot snapshot, int amount) throws Exception {
@@ -63,7 +64,13 @@ public class CartService {
 
     public List<CartProduct> getCart() {
         User user = getAuthenticatedUser();
-        return cartRepository.findByUser(user);
+
+        List<CartProduct> cart = cartRepository.findByUser(user);
+        for (CartProduct item : cart) {
+            ProductSnapshot updated = snapshotPriceSyncService.refreshPrice(item.getProductSnapshot());
+            item.setProductSnapshot(updated);
+        }
+        return cartRepository.saveAll(cart);
     }
     public CartSummary getCartSummary() {
         List<CartProduct> items = getCart();

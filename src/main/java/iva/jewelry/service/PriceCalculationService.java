@@ -27,7 +27,7 @@ public class PriceCalculationService {
                 .orElseThrow();
 
         BigDecimal price = variant.getPricePerGram()
-                .multiply(model.getWeight());
+                .multiply(model.getWeight()).add(model.getBasePrice());
 
         if (mainStone != null && config.getMainStoneSize() != null) {
             price = price.add(

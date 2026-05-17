@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @Builder
 @Jacksonized
 public class ProductSnapshot {
+    private String modelId;
     private String modelName;
     private String category;
     private String material;
@@ -50,7 +51,6 @@ public class ProductSnapshot {
                 .sideStoneSize(normalizeDouble(sideStoneSize))
                 .sideStoneShape(trim(sideStoneShape))
                 .ringSize(ringSize)
-                .price(normalizeBigDecimal(price))
                 .build();
     }
     private String trim(String s) {

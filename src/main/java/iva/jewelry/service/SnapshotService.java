@@ -18,6 +18,7 @@ public class SnapshotService {
             BigDecimal price
     ) {
         return ProductSnapshot.builder()
+                .modelId(model.getId())
                 .modelName(model.getName())
                 .category(model.getCategoryId())
                 .material(config.getMaterial())

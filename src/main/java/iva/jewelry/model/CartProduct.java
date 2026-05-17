@@ -29,9 +29,6 @@ public class CartProduct implements Serializable {
     private User user;
 
     @Embedded
-    //@Convert(converter = ProductSnapshotConverter.class)
-//    @JdbcTypeCode(SqlTypes.JSON)
-//    @Column(name = "product_snapshot", columnDefinition = "jsonb")
     private ProductSnapshot productSnapshot;
 
     @Column(nullable = false)
@@ -45,10 +42,4 @@ public class CartProduct implements Serializable {
         if (price == null) price = BigDecimal.ZERO;
         return price.multiply(BigDecimal.valueOf(amount));
     }
-
-
-    //@Column(nullable = false)
-//    private BigDecimal price;
-
-
 }
